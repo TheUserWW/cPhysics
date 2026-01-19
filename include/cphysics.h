@@ -1,0 +1,9 @@
+#ifndef CPHYSICS_CPHYSICS_H
+#define CPHYSICS_CPHYSICS_H
+#include "../include/entity.h"
+#include "../include/constant.h"
+#include "../include/field.h"
+#include "../include/movement.h"
+#include "../include/time_flow.h"
+#include "../include/plog.h"
+#endif //CPHYSICS_CPHYSICS_H
