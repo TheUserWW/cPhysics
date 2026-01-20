@@ -19,5 +19,7 @@ typedef struct magnetic_field {
 }magnetic_field;
 
 void apply_gravitational_field(Entity* obj, gravitational_field g);
+void apply_electric_field(Entity* obj, electric_field g);
+void apply_magnetic_field(Entity* obj, magnetic_field g);
 
 #endif //CPHYSICS_FIELD_H

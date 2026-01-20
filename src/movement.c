@@ -16,6 +16,12 @@ void apply_electric_force(const Entity* obj_1, const Entity* obj_2) {
        dz = obj_1->position[2] - obj_2->position[2];
 
     double euclidean_distance = get_euclidean_distance(obj_1,obj_2);
+    
+    // 防止除零错误
+    if (euclidean_distance < 1e-10) {
+        return; // 距离太小，忽略力计算
+    }
+    
     double euclidean_distance_squared = pow(euclidean_distance,2);
 
     const double force_magnitude = (K*obj_1 -> charge * obj_2 -> charge) / euclidean_distance_squared;
