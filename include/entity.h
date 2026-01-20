@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "constant.h"
+#include "error_codes.h"
 
 
 
@@ -37,15 +38,11 @@ double get_euclidean_distance(const Entity* obj_1, const Entity* obj_2);
 void get_linear_momentum(const Entity* obj, double result[3]);
 
 //set functions
-int set_entity_position(Entity* obj, double x, double y, double z);
-int set_entity_velocity(Entity* obj, double x, double y, double z);
-int set_entity_acceleration(Entity* obj, double x, double y, double z);
-int set_entity_angular_velocity(Entity* obj, double x, double y, double z);
-int set_entity_angular_acceleration(Entity* obj, double x, double y, double z);
-
-
-
-void process_collision(Entity* obj_1, Entity* obj_2, double* loss);
+ErrorCode set_entity_position(Entity* obj, double x, double y, double z);
+ErrorCode set_entity_velocity(Entity* obj, double x, double y, double z);
+ErrorCode set_entity_acceleration(Entity* obj, double x, double y, double z);
+ErrorCode set_entity_angular_velocity(Entity* obj, double x, double y, double z);
+ErrorCode set_entity_angular_acceleration(Entity* obj, double x, double y, double z);
 
 
 #endif //CPHYSICS_ENTITY_H

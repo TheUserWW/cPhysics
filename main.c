@@ -18,7 +18,7 @@ int main(void) {
     test_entity.quaternion[2] = 0.7071; // y
     test_entity.quaternion[3] = 0.0;    // z
 
-    int code = set_entity_angular_velocity(&test_entity,0.1,0.2,0.3);
+    ErrorCode code = set_entity_angular_velocity(&test_entity,0.1,0.2,0.3);
     code = set_entity_acceleration(&test_entity,0.01,0.02,0.03);
 
     test_entity.moment_of_inertia = 2.5;

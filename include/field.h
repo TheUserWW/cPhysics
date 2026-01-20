@@ -16,10 +16,18 @@ typedef struct magnetic_field {
     double magnitude;
     double direction[3];
     double position[3];
-}magnetic_field;
+} magnetic_field;
 
-void apply_gravitational_field(Entity* obj, gravitational_field g);
-void apply_electric_field(Entity* obj, electric_field g);
-void apply_magnetic_field(Entity* obj, magnetic_field g);
+typedef enum {
+    FIELD_SUCCESS = 0,
+    FIELD_ERROR_NULL_POINTER,
+    FIELD_ERROR_INVALID_MASS,
+    FIELD_ERROR_INVALID_CHARGE,
+    FIELD_ERROR_STATIC_OBJECT
+} FieldErrorCode;
+
+FieldErrorCode apply_gravitational_field(Entity* obj, const gravitational_field* g);
+FieldErrorCode apply_electric_field(Entity* obj, const electric_field* e);
+FieldErrorCode apply_magnetic_field(Entity* obj, const magnetic_field* b);
 
 #endif //CPHYSICS_FIELD_H

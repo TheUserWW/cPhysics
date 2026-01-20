@@ -29,3 +29,24 @@ char* LOG(const char* str) {
     printf("%s",str);
     return str;
 }
+
+const char* get_error_description(ErrorCode error) {
+    switch (error) {
+        case OPERATION_SET_SUCCESS:
+            return "Operation set successfully";
+        case OPERATION_SET_FAILED:
+            return "Operation set failed";
+        case OPERATION_GET_SUCCESS:
+            return "Operation get successfully";
+        case OPERATION_GET_FAILED:
+            return "Operation get failed";
+        case ENTITY_VOID_ERROR:
+            return "Entity is null pointer error";
+        case ENTITY_UNFULLY_UNDEFINED:
+            return "Entity not fully defined error";
+        case DIVISION_BY_ZERO:
+            return "Division by zero error";
+        default:
+            return "Unknown error";
+    }
+}

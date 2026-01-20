@@ -62,5 +62,18 @@ install(FILES ${CPHYSICS_HEADERS} DESTINATION include/cphysics)
 # 可执行文件（可选，如果需要测试程序）
 add_executable(CPhysics main.c
         src/plog.c
-        include/plog.h)
+        include/plog.h
+        src/collider.c
+        include/collider.h
+        include/error_codes.h
+        src/sphere.c
+        include/basic_obj/sphere.h
+        src/cylinder.c
+        include/basic_obj/cylinder.h
+        src/cube.c
+        include/basic_obj/cube.h
+        src/pyramid.c
+        include/basic_obj/pyramid.h
+        src/graphics/camera.c
+        include/graphics/camera.h)
 target_link_libraries(CPhysics cphysics_static)
