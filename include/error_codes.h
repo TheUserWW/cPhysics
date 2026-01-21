@@ -1,6 +1,10 @@
 #ifndef CPHYSICS_ERROR_CODES_H
 #define CPHYSICS_ERROR_CODES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     OPERATION_SET_FAILED     = 0x00000000,
     OPERATION_SET_SUCCESS    = 0x00000001,
@@ -10,5 +14,9 @@ typedef enum {
     ENTITY_UNFULLY_UNDEFINED = 0x00000005,
     DIVISION_BY_ZERO         = 0x00000006
 } ErrorCode;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CPHYSICS_ERROR_CODES_H

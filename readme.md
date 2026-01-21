@@ -15,32 +15,50 @@ A lightweight physics simulation engine written in C. This library provides fund
 ```
 CPhysics/
 ├── include/              # Header files
+│   ├── basic_obj/       # Basic 3D object definitions
+│   │   ├── cube.h       # Cube object
+│   │   ├── cylinder.h   # Cylinder object
+│   │   ├── pyramid.h    # Pyramid object
+│   │   └── sphere.h     # Sphere object
+│   ├── graphics/        # Graphics components
+│   │   └── camera.h     # Camera system
 │   ├── cphysics.h       # Main library header
 │   ├── entity.h         # Entity definitions and functions
 │   ├── field.h          # Field calculations
 │   ├── movement.h       # Movement and kinematics
 │   ├── time_flow.h      # Time flow management
 │   ├── plog.h           # Physics logging system
-│   └── constant.h       # Physical constants
+│   ├── collider.h       # Collision detection
+│   ├── constant.h       # Physical constants
+│   └── error_codes.h    # Error code definitions
 ├── src/                 # Source files
+│   ├── graphics/        # Graphics implementations
+│   │   └── camera.c     # Camera implementation
 │   ├── entity.c         # Entity implementation
 │   ├── field.c          # Field calculations
 │   ├── movement.c       # Movement implementation
 │   ├── time_flow.c      # Time flow implementation
-│   └── plog.c           # Physics logging implementation
+│   ├── plog.c           # Physics logging implementation
+│   ├── collider.c       # Collision detection
+│   ├── cube.c           # Cube implementation
+│   ├── cylinder.c       # Cylinder implementation
+│   ├── pyramid.c        # Pyramid implementation
+│   └── sphere.c         # Sphere implementation
 ├── doc/                 # Documentation
 │   ├── Entity.md        # Entity system documentation
-│   └── Formulas.md      # Physics formulas reference
+│   ├── Field.md         # Field calculations documentation
+│   ├── Formulas.md      # Physics formulas reference
+│   └── Movement.md      # Movement system documentation
 ├── main.c               # Example usage and test suite
-└── CMakeLists.txt       # Build configuration
-
+├── CMakeLists.txt       # Build configuration
+└── LICENSE              # MIT License
 ```
 
 ## Quick Start
 
 ### Prerequisites
 
-- CMake (version 4.1 or higher)
+- CMake (version 3.10 or higher)
 - C compiler (GCC, Clang, or MSVC)
 - Make or Ninja build system
 
@@ -48,7 +66,7 @@ CPhysics/
 
 ```bash
 # Clone or navigate to the project directory
-cd CPhysics
+cd cPhysics
 
 # Create build directory
 mkdir build && cd build
@@ -60,7 +78,7 @@ cmake ..
 cmake --build .
 
 # Run the test suite
-./CPhysics
+./cPhysics
 ```
 
 ### Example Usage

@@ -1,5 +1,10 @@
 #ifndef CPHYSICS_MOVEMENT_H
 #define CPHYSICS_MOVEMENT_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "../include/entity.h"
 
 //Just impose a arbitrary for an object
@@ -22,4 +27,8 @@ void update_quaternion_with_angular_velocity(double q[4], const double omega[3],
 void apply_torque(Entity* obj, const double torque[3]);
 void update_rotation(Entity* obj, double dt);
 void rotate_entity(Entity* obj, const double axis[3], double angle);
+#ifdef __cplusplus
+}
+#endif
+
 #endif //CPHYSICS_MOVEMENT_H

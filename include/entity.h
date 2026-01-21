@@ -1,5 +1,10 @@
 #ifndef CPHYSICS_ENTITY_H
 #define CPHYSICS_ENTITY_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
@@ -44,5 +49,9 @@ ErrorCode set_entity_acceleration(Entity* obj, double x, double y, double z);
 ErrorCode set_entity_angular_velocity(Entity* obj, double x, double y, double z);
 ErrorCode set_entity_angular_acceleration(Entity* obj, double x, double y, double z);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CPHYSICS_ENTITY_H

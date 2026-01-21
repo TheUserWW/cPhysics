@@ -76,4 +76,10 @@ add_executable(CPhysics main.c
         include/basic_obj/pyramid.h
         src/graphics/camera.c
         include/graphics/camera.h)
+
+# 设置头文件包含路径（必须在目标定义之后）
+target_include_directories(cphysics_shared PUBLIC include)
+target_include_directories(cphysics_static PUBLIC include)
+target_include_directories(CPhysics PUBLIC include)
+
 target_link_libraries(CPhysics cphysics_static)

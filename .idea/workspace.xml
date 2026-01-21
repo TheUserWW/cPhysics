@@ -29,28 +29,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ae966cc5-286c-4105-bcc7-fcdfc5cb2594" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/include/basic_obj/cube.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/basic_obj/cylinder.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/basic_obj/pyramid.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/basic_obj/sphere.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/collider.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/graphics/camera.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/collider.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/cube.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/cylinder.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/graphics/camera.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pyramid.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/sphere.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/doc/Field.md" beforeDir="false" afterPath="$PROJECT_DIR$/doc/Field.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/entity.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/entity.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/field.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/field.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/plog.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/plog.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/entity.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/entity.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/field.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/field.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/plog.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/plog.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/basic_obj/cube.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/basic_obj/cube.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/basic_obj/sphere.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/basic_obj/sphere.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/cphysics.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/cphysics.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/graphics/camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/graphics/camera.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,11 +103,6 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake 应用程序.CPhysics">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="CPhysics" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="CPhysics" TARGET_NAME="CPhysics" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="CPhysics" RUN_TARGET_NAME="CPhysics">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -159,6 +139,7 @@
       <workItem from="1768890839520" duration="1836000" />
       <workItem from="1768895600492" duration="1199000" />
       <workItem from="1768912964767" duration="6653000" />
+      <workItem from="1768952797475" duration="1490000" />
     </task>
     <servers />
   </component>

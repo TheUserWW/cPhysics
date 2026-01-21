@@ -1,6 +1,10 @@
 #ifndef CPHYSICS_COLLIDER_H
 #define CPHYSICS_COLLIDER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "entity.h"
 
 /**
@@ -13,5 +17,9 @@
  * @param loss Energy loss pointer (optional, used to store energy loss during collision)
  */
 void process_collision(Entity* obj_1, Entity* obj_2, double* loss);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CPHYSICS_COLLIDER_H
