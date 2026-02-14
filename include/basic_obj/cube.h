@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include "../entity.h"
+#include "../core/entity.h"
 typedef struct Cube {
     Entity ent;
     double height;

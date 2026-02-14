@@ -9,12 +9,12 @@ char* show_entity_details(Entity* obj) {
     printf("Name: %s\n", obj->name);
     printf("Mass: %f\n", obj->mass);
     printf("Charge: %f\n", obj->charge);
-    printf("Position: x: %f, y: %f, z: %f\n", obj->position[0], obj->position[1], obj->position[2]);
-    printf("Velocity: x: %f, y: %f, z: %f\n", obj->velocity[0], obj->velocity[1], obj->velocity[2]);
-    printf("Acceleration: x: %f, y: %f, z: %f\n", obj->acceleration[0], obj->acceleration[1], obj->acceleration[2]);
+    printf("Position: x: %f, y: %f, z: %f\n", obj->position.x, obj->position.y, obj->position.z);
+    printf("Velocity: x: %f, y: %f, z: %f\n", obj->velocity.x, obj->velocity.y, obj->velocity.z);
+    printf("Acceleration: x: %f, y: %f, z: %f\n", obj->acceleration.x, obj->acceleration.y, obj->acceleration.z);
     printf("Quaternion: w: %f, x: %f, y: %f, z: %f\n", obj->quaternion[0], obj->quaternion[1], obj->quaternion[2], obj->quaternion[3]);
-    printf("Angular Velocity: x: %f, y: %f, z: %f\n", obj->angular_velocity[0], obj->angular_velocity[1], obj->angular_velocity[2]);
-    printf("Angular Acceleration: x: %f, y: %f, z: %f\n", obj->angular_acceleration[0], obj->angular_acceleration[1], obj->angular_acceleration[2]);
+    printf("Angular Velocity: x: %f, y: %f, z: %f\n", obj->angular_velocity.x, obj->angular_velocity.y, obj->angular_velocity.z);
+    printf("Angular Acceleration: x: %f, y: %f, z: %f\n", obj->angular_acceleration.x, obj->angular_acceleration.y, obj->angular_acceleration.z);
     printf("Moment of Inertia: %f\n", obj->moment_of_inertia);
     printf("Coefficient of Restitution: %f\n", obj->coefficient_of_restitution);
     printf("Rigid Body: %s\n", obj->rigid_body ? "true" : "false");

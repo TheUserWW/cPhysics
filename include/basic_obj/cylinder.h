@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "../entity.h"
+#include "../core/entity.h"
 typedef struct Cylinder {
     Entity ent;
     double height;

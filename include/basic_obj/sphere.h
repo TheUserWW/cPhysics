@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "../entity.h"
+#include "../core/entity.h"
 typedef struct Sphere {
     Entity ent;
     double radius;

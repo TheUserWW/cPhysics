@@ -5,11 +5,11 @@
 extern "C" {
 #endif
 
-#include "entity.h"
+#include "core/entity.h"
 #include "constant.h"
-#include "field.h"
-#include "movement.h"
-#include "time_flow.h"
+#include "core/field.h"
+#include "core/movement.h"
+#include "core/time_flow.h"
 #include "plog.h"
 
 #ifdef __cplusplus

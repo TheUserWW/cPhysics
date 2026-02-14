@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "entity.h"
+#include "core/entity.h"
 #include "stdio.h"
 #include "error_codes.h"
 
