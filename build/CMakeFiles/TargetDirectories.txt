@@ -1,7 +1,0 @@
-D:/Documents/cPhysics/build/CMakeFiles/core.dir
-D:/Documents/cPhysics/build/CMakeFiles/cphysics_shared.dir
-D:/Documents/cPhysics/build/CMakeFiles/mathlib.dir
-D:/Documents/cPhysics/build/CMakeFiles/CPhysics.dir
-D:/Documents/cPhysics/build/CMakeFiles/INSTALL.dir
-D:/Documents/cPhysics/build/CMakeFiles/ALL_BUILD.dir
-D:/Documents/cPhysics/build/CMakeFiles/ZERO_CHECK.dir
