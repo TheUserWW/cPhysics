@@ -1,4 +1,4 @@
-#include "../include/basic_obj/cylinder.h"
+#include "basic_obj/cylinder.h"
 #include <stdlib.h>
 
 Cylinder* new_cylinder(Entity e, double h, double r) {

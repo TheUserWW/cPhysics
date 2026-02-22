@@ -1,2 +1,2 @@
-#include "../include/basic_obj/pyramid.h"
+#include "basic_obj/pyramid.h"
 #

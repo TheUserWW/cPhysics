@@ -1,4 +1,4 @@
-#include "../../include/core/movement.h"
+#include "core/movement.h"
 
 void apply_force(Entity* obj, const Vector* acceleration_vector) {
     if (acceleration_vector && obj) {

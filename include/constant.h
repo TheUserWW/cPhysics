@@ -8,7 +8,7 @@ extern "C" {
 #define PI 3.14159265358979323846f
 #define G 6.67430e-11f
 #define K 8.987551787e9f
-#define C 3e8
+#define SPEED_OF_LIGHT 3e8
 
 #ifdef __cplusplus
 }

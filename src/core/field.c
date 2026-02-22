@@ -1,4 +1,4 @@
-#include "../../include/core/field.h"
+#include "core/field.h"
 #include <math.h>
 #include <float.h>
 

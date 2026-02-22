@@ -2,7 +2,7 @@
 // Created by wcx16 on 2026/1/19.
 //
 
-#include "../include/plog.h"
+#include "plog.h"
 
 char* show_entity_details(Entity* obj) {
     printf("=== Entity Details ===\n");

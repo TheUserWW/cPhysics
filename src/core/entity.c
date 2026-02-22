@@ -1,5 +1,5 @@
-#include "../../include/core/entity.h"
-#include "../../include/plog.h"
+#include "core/entity.h"
+#include "plog.h"
 #include <string.h>
 #include <math.h>
 

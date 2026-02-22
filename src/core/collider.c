@@ -1,4 +1,4 @@
-#include "../../include/core/collider.h"
+#include "core/collider.h"
 #include <math.h>
 
 void process_collision(Entity* obj_1, Entity* obj_2, double* loss) {
