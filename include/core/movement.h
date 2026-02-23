@@ -8,22 +8,29 @@ extern "C" {
 #include "entity.h"
 
 void apply_force(Entity* obj, const Vector* acceleration_vector);
-
-void apply_electric_force(const Entity* obj_1, const Entity* obj_2);
-
+void apply_electric_force(Entity* obj_1, Entity* obj_2);
 void apply_universal_gravitation(Entity* obj_1, Entity* obj_2);
 
 
-void quaternion_multiply(const double q1[4], const double q2[4], double result[4]);
-void quaternion_conjugate(const double q[4], double result[4]);
-void quaternion_normalize(double q[4]);
-void axis_angle_to_quaternion(const Vector* axis, double angle, double q[4]);
-void euler_to_quaternion(double pitch, double yaw, double roll, double q[4]);
-void rotate_vector_by_quaternion(const Vector* v, const double q[4], Vector* result);
-void update_quaternion_with_angular_velocity(double q[4], const Vector* omega, double dt);
+#include "../mathlib/Quaternion.h"
+
+Quaternion quaternion_multiply(Quaternion q1, Quaternion q2);
+Quaternion quaternion_conjugate(Quaternion q);
+Quaternion quaternion_normalize(Quaternion q);
+Quaternion axis_angle_to_quaternion(const Vector* axis, double angle);
+Quaternion euler_to_quaternion(double pitch, double yaw, double roll);
+void rotate_vector_by_quaternion(const Vector* v, Quaternion q, Vector* result);
+void update_quaternion_with_angular_velocity(Quaternion* q, const Vector* omega, double dt);
 void apply_torque(Entity* obj, const Vector* torque);
 void update_rotation(Entity* obj, double dt);
 void rotate_entity(Entity* obj, const Vector* axis, double angle);
+
+// Collision detection and response functions
+double get_entity_radius(const Entity* entity);
+void set_entity_radius(Entity* entity, double radius);
+int check_sphere_collision(const Entity* obj_1, const Entity* obj_2);
+void resolve_sphere_collision(Entity* obj_1, Entity* obj_2);
+void apply_collision_response(Entity* entities, int count);
 #ifdef __cplusplus
 }
 #endif

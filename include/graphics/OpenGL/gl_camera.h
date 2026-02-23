@@ -1,6 +1,10 @@
 #ifndef CPHYSICS_GL_CAMERA_H
 #define CPHYSICS_GL_CAMERA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <GLFW/glfw3.h>
 
 typedef struct {
@@ -29,5 +33,9 @@ void camera_set_global(Camera* cam);
 
 // Get global camera pointer
 Camera* camera_get_global(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CPHYSICS_GL_CAMERA_H

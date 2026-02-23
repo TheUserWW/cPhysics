@@ -9,10 +9,9 @@ extern "C" {
 #include <stdbool.h>
 #include <math.h>
 #include "../constant.h"
-#include "../error_codes.h"
-#include "../mathlib/Vector.h"
-
-
+#include "error_codes.h"
+#include "mathlib/Vector.h"
+#include "mathlib/Quaternion.h"
 
 
 typedef struct Entity {
@@ -22,7 +21,7 @@ typedef struct Entity {
     Vector position;
     Vector velocity;
     Vector acceleration;
-    double quaternion[4];
+    Quaternion quaternion;
     Vector angular_velocity;
     Vector angular_acceleration;
     double moment_of_inertia;

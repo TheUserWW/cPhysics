@@ -134,11 +134,12 @@ static GLuint load_cross_cubemap(const char* texture_path, int is_hdr) {
     free(face_data);
     stbi_image_free(data);
     
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     
     return texture_id;
 }
@@ -187,8 +188,8 @@ static GLuint load_equirectangular_cubemap(const char* texture_path, int is_hdr)
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
     
     int face_size = height;
-    if (face_size > 2048) face_size = 2048;
-    if (face_size < 256) face_size = 1024;
+    if (face_size > 4096) face_size = 4096; // 支持4K纹理
+    if (face_size < 512) face_size = 1024; // 提高最小尺寸
     
     float* face_data = (float*)malloc(face_size * face_size * 3 * sizeof(float));
     

@@ -12,7 +12,7 @@ char* show_entity_details(Entity* obj) {
     printf("Position: x: %f, y: %f, z: %f\n", obj->position.x, obj->position.y, obj->position.z);
     printf("Velocity: x: %f, y: %f, z: %f\n", obj->velocity.x, obj->velocity.y, obj->velocity.z);
     printf("Acceleration: x: %f, y: %f, z: %f\n", obj->acceleration.x, obj->acceleration.y, obj->acceleration.z);
-    printf("Quaternion: w: %f, x: %f, y: %f, z: %f\n", obj->quaternion[0], obj->quaternion[1], obj->quaternion[2], obj->quaternion[3]);
+    printf("Quaternion: w: %f, x: %f, y: %f, z: %f\n", obj->quaternion.w, obj->quaternion.x, obj->quaternion.y, obj->quaternion.z);
     printf("Angular Velocity: x: %f, y: %f, z: %f\n", obj->angular_velocity.x, obj->angular_velocity.y, obj->angular_velocity.z);
     printf("Angular Acceleration: x: %f, y: %f, z: %f\n", obj->angular_acceleration.x, obj->angular_acceleration.y, obj->angular_acceleration.z);
     printf("Moment of Inertia: %f\n", obj->moment_of_inertia);

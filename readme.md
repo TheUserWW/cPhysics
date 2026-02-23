@@ -8,50 +8,66 @@ A lightweight physics simulation engine written in C. This library provides fund
 - **Universal Gravitation**: Calculate gravitational forces between celestial bodies
 - **Electrostatic Forces**: Compute electric forces between charged particles
 - **3D Physics**: Support for 3-dimensional position, velocity, and acceleration vectors
+- **OpenGL Graphics Support**: Real-time 3D visualization with camera, lighting, and texture support
+- **Mathematical Library**: Comprehensive vector operations and mathematical utilities
+- **Skybox Rendering**: High dynamic range (HDR) skybox support for realistic environments
+- **Collision Detection**: Basic collision detection between entities
+- **Physics Logging**: Comprehensive logging system for simulation data
 - **CMake Build System**: Easy compilation and integration with other projects
 - **Cross-Platform**: Compatible with Windows, Linux, and macOS
 
 ## Project Structure
 ```
 CPhysics/
-├── include/              # Header files
-│   ├── basic_obj/       # Basic 3D object definitions
-│   │   ├── cube.h       # Cube object
-│   │   ├── cylinder.h   # Cylinder object
-│   │   ├── pyramid.h    # Pyramid object
-│   │   └── sphere.h     # Sphere object
+├── Dependencies/         # Third-party libraries
+│   ├── GLEW/           # OpenGL Extension Wrangler Library
+│   ├── include/        # Header files for dependencies
+│   │   ├── GLFW/       # GLFW headers
+│   │   └── stb_image.h # Image loading library
+│   └── lib-mingw-w64/  # Precompiled libraries for MinGW-w64
+├── include/             # Header files
+│   ├── basic_obj/      # Basic 3D object definitions
+│   ├── core/           # Core physics components
+│   │   ├── collider.h  # Collision detection
+│   │   ├── entity.h    # Entity definitions
+│   │   ├── field.h     # Field calculations
+│   │   ├── movement.h  # Movement and kinematics
+│   │   └── time_flow.h # Time flow management
 │   ├── graphics/        # Graphics components
-│   │   └── camera.h     # Camera system
-│   ├── cphysics.h       # Main library header
-│   ├── entity.h         # Entity definitions and functions
-│   ├── field.h          # Field calculations
-│   ├── movement.h       # Movement and kinematics
-│   ├── time_flow.h      # Time flow management
-│   ├── plog.h           # Physics logging system
-│   ├── collider.h       # Collision detection
-│   ├── constant.h       # Physical constants
-│   └── error_codes.h    # Error code definitions
-├── src/                 # Source files
-│   ├── graphics/        # Graphics implementations
-│   │   └── camera.c     # Camera implementation
-│   ├── entity.c         # Entity implementation
-│   ├── field.c          # Field calculations
-│   ├── movement.c       # Movement implementation
-│   ├── time_flow.c      # Time flow implementation
-│   ├── plog.c           # Physics logging implementation
-│   ├── collider.c       # Collision detection
-│   ├── cube.c           # Cube implementation
-│   ├── cylinder.c       # Cylinder implementation
-│   ├── pyramid.c        # Pyramid implementation
-│   └── sphere.c         # Sphere implementation
-├── doc/                 # Documentation
-│   ├── Entity.md        # Entity system documentation
-│   ├── Field.md         # Field calculations documentation
-│   ├── Formulas.md      # Physics formulas reference
-│   └── Movement.md      # Movement system documentation
-├── main.c               # Example usage and test suite
-├── CMakeLists.txt       # Build configuration
-└── LICENSE              # MIT License
+│   │   └── OpenGL/     # OpenGL implementations
+│   │       ├── gl_camera.h  # Camera system
+│   │       ├── gl_cube.h    # Cube rendering
+│   │       ├── gl_skybox.h  # Skybox rendering
+│   │       ├── gl_sphere.h  # Sphere rendering
+│   │       └── gl_texture.h # Texture management
+│   ├── mathlib/        # Mathematical utilities
+│   │   └── Vector.h    # Vector operations
+│   ├── cphysics.h      # Main library header
+│   ├── constant.h      # Physical constants
+│   ├── error_codes.h   # Error code definitions
+│   └── plog.h          # Physics logging system
+├── src/                # Source files
+│   ├── core/           # Core physics implementations
+│   ├── graphics/       # Graphics implementations
+│   │   └── OpenGL/     # OpenGL implementations
+│   ├── mathlib/        # Mathematical utilities
+│   │   └── Vector.c    # Vector operations
+│   ├── cube.c          # Cube implementation
+│   ├── cylinder.c     # Cylinder implementation
+│   ├── plog.c         # Physics logging implementation
+│   └── pyramid.c      # Pyramid implementation
+├── resources/          # Resource files
+│   └── skybox/        # Skybox HDR textures
+├── doc/               # Documentation
+│   ├── Entity.md      # Entity system documentation
+│   ├── Field.md       # Field calculations documentation
+│   ├── Formulas.md    # Physics formulas reference
+│   └── Movement.md    # Movement system documentation
+├── CMakeLists.txt     # Build configuration
+├── LICENSE            # MIT License
+├── gitignore          # Git ignore rules
+├── main.c             # Example usage and test suite
+└── readme.md          # This file
 ```
 
 ## Quick Start
@@ -61,6 +77,10 @@ CPhysics/
 - CMake (version 3.10 or higher)
 - C compiler (GCC, Clang, or MSVC)
 - Make or Ninja build system
+- OpenGL libraries (for graphics features)
+- GLFW (for window and input management)
+- GLEW (for OpenGL extensions)
+- stb_image (for texture loading)
 
 ### Building the Project
 

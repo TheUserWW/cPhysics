@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(CPhysics C)
+project(CPhysics C CXX)
 
 set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 
 # ========================
 # Dependencies: GLFW and GLEW
@@ -51,7 +52,7 @@ set(CORE_SOURCES
         src/core/movement.c
         src/core/time_flow.c
         src/core/collider.c
-        src/graphics/OpenGL/gl_sphere.c
+        src/graphics/OpenGL/gl_sphere.cpp
         src/graphics/OpenGL/gl_cube.c
         src/graphics/OpenGL/gl_texture.c
         src/graphics/OpenGL/gl_skybox.c
@@ -60,13 +61,12 @@ set(CORE_SOURCES
 
 set(MATHLIB_SOURCES
         src/mathlib/Vector.c
+        src/mathlib/Quaternion.c
+        include/mathlib/Quaternion.h
 )
 
 set(OTHER_SOURCES
         src/plog.c
-        src/cylinder.c
-        src/cube.c
-        src/pyramid.c
 )
 
 set(CORE_HEADERS
@@ -75,11 +75,14 @@ set(CORE_HEADERS
         include/core/movement.h
         include/core/time_flow.h
         include/core/collider.h
-        include/graphics/OpenGL/gl_sphere.h
+        include/graphics/OpenGL/gl_sphere.hpp
         include/graphics/OpenGL/gl_cube.h
         include/graphics/OpenGL/gl_texture.h
         include/graphics/OpenGL/gl_skybox.h
         include/graphics/OpenGL/gl_camera.h
+        src/core/entity_manager.cpp
+        include/core/entity_manager.h
+        src/core/entity_manager.cpp
 )
 
 set(OTHER_HEADERS
@@ -87,10 +90,6 @@ set(OTHER_HEADERS
         include/cphysics.h
         include/plog.h
         include/error_codes.h
-        include/basic_obj/sphere.h
-        include/basic_obj/cylinder.h
-        include/basic_obj/cube.h
-        include/basic_obj/pyramid.h
         include/mathlib/Vector.h
 )
 
@@ -118,6 +117,7 @@ endfunction()
 
 add_library(core SHARED ${CORE_SOURCES} ${CORE_HEADERS})
 setup_shared_lib(core core)
+set_target_properties(core PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(core
         mathlib
         "${GLFW_LIB_DIR}/libglfw3.a"
@@ -128,7 +128,9 @@ target_link_libraries(core
 add_library(cphysics_shared SHARED ${OTHER_SOURCES} ${OTHER_HEADERS})
 setup_shared_lib(cphysics_shared cphysics)
 
-add_library(mathlib STATIC ${MATHLIB_SOURCES} include/mathlib/Vector.h)
+add_library(mathlib STATIC ${MATHLIB_SOURCES} include/mathlib/Vector.h
+        src/mathlib/Quaternion.c
+        include/mathlib/Quaternion.h)
 target_include_directories(mathlib PUBLIC include)
 
 # ========================
@@ -145,7 +147,7 @@ endif()
 # Executable
 # ========================
 
-add_executable(CPhysics main.c)
+add_executable(CPhysics main.cpp)
 
 set_target_properties(CPhysics PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

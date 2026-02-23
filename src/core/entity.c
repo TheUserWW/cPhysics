@@ -42,10 +42,7 @@ struct Entity new_entity(const char* n, double m, double c,
 
     obj.rigid_body = rigid;
 
-    obj.quaternion[0] = 1.0;
-    obj.quaternion[1] = 0.0;
-    obj.quaternion[2] = 0.0;
-    obj.quaternion[3] = 0.0;
+    obj.quaternion = quat_identity();
     obj.angular_velocity.x = 0.0;
     obj.angular_velocity.y = 0.0;
     obj.angular_velocity.z = 0.0;
