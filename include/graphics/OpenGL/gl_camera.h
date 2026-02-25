@@ -6,14 +6,17 @@ extern "C" {
 #endif
 
 #include <GLFW/glfw3.h>
+#include "mathlib/Vector.h"
 
 typedef struct {
-    float x, y, z;
+    Vector position;
     float yaw;
     float pitch;
     int first_mouse;
     float last_mouse_x;
     float last_mouse_y;
+    Vector velocity;
+    float acceleration;
 } Camera;
 
 // Initialize camera

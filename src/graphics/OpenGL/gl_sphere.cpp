@@ -1,7 +1,12 @@
+#define _USE_MATH_DEFINES
 #include "graphics/OpenGL/gl_sphere.hpp"
 #include <cmath>
 #include <cstring>
 #include <cstdio>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 static const char* vertexShaderSource = R"(
 #version 330 core
@@ -346,7 +351,13 @@ void SphereRenderer::render(const Entity* entity, const float* view, const float
     } else if (entity->charge < 0) {
         color[0] = 0.3f; color[1] = 0.3f; color[2] = 1.0f;
     } else {
-        color[0] = 0.3f; color[1] = 1.0f; color[2] = 0.3f;
+        if (strcmp(entity->name, "StarA") == 0) {
+            color[0] = 1.0f; color[1] = 0.8f; color[2] = 0.2f;
+        } else if (strcmp(entity->name, "StarB") == 0) {
+            color[0] = 1.0f; color[1] = 0.4f; color[2] = 0.1f;
+        } else {
+            color[0] = 0.3f; color[1] = 1.0f; color[2] = 0.3f;
+        }
     }
     
     GLuint modelLoc = glGetUniformLocation(shader_program, "model");

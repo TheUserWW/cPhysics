@@ -13,17 +13,40 @@ typedef struct Entity {
     char name[256];                    // Entity identifier (max 255 characters + null terminator)
     double mass;                       // Mass in kilograms (kg)
     double charge;                     // Electric charge in coulombs (C)
-    double position[3];                // 3D position vector (x, y, z) in meters
-    double velocity[3];                // 3D velocity vector (vx, vy, vz) in m/s
-    double acceleration[3];            // 3D acceleration vector (ax, ay, az) in m/s²
-    double quaternion[4];              // Orientation quaternion (w, x, y, z) - unit quaternion
-    double angular_velocity[3];        // Angular velocity vector (ωx, ωy, ωz) in rad/s
-    double angular_acceleration[3];    // Angular acceleration vector (αx, αy, αz) in rad/s²
+    Vector position;                   // 3D position vector
+    Vector velocity;                   // 3D velocity vector
+    Vector acceleration;               // 3D acceleration vector
+    Quaternion quaternion;             // Orientation quaternion (w, x, y, z)
+    Vector angular_velocity;           // Angular velocity vector (rad/s)
+    Vector angular_acceleration;       // Angular acceleration vector (rad/s²)
     double moment_of_inertia;          // Moment of inertia scalar in kg·m²
     double coefficient_of_restitution; // Elasticity coefficient (0.0-1.0) for collisions
     bool rigid_body;                   // Rigid body flag (true for rigid body physics)
     bool is_static;                    // Static object flag (true for immovable objects)
 } Entity;
+```
+
+### Supporting Types
+
+#### Vector Structure
+
+```c
+typedef struct Vector {
+    double x;
+    double y;
+    double z;
+} Vector;
+```
+
+#### Quaternion Structure
+
+```c
+typedef struct {
+    float w;  // Scalar (real) component
+    float x;  // i-component (imaginary)
+    float y;  // j-component (imaginary)
+    float z;  // k-component (imaginary)
+} Quaternion;
 ```
 
 ### Field Descriptions
@@ -34,12 +57,12 @@ typedef struct Entity {
 - **charge**: Electric charge in coulombs - used for electromagnetic interactions
 
 #### Translational Motion
-- **position**: 3D coordinates in Cartesian space (x, y, z) in meters
-- **velocity**: Rate of change of position in meters per second (vx, vy, vz)
-- **acceleration**: Rate of change of velocity in meters per second squared (ax, ay, az)
+- **position**: 3D coordinates in Cartesian space using Vector type
+- **velocity**: Rate of change of position in meters per second
+- **acceleration**: Rate of change of velocity in meters per second squared
 
 #### Rotational Dynamics
-- **quaternion**: 4-component quaternion representing 3D orientation (w, x, y, z)
+- **quaternion**: 4-component quaternion representing 3D orientation
   - Uses unit quaternions to avoid gimbal lock and ensure numerical stability
   - w component represents the scalar (real) part
   - x, y, z components represent the vector (imaginary) part
@@ -59,44 +82,184 @@ typedef struct Entity {
 Use the `new_entity()` function to create new entities with specified properties:
 
 ```c
-Entity new_entity(const char* name, double mass, double charge, 
-                 double position[3], double velocity[3], double acceleration[3],
-                 double quaternion[4], double angular_velocity[3], 
-                 double moment_of_inertia, double coefficient_of_restitution,
-                 bool rigid_body, bool is_static);
+struct Entity new_entity(const char* n, double m, double c,
+                        const Vector* d, const Vector* v,
+                        const Vector* a, double cor, bool rigid, bool s);
 ```
+
+**Parameters:**
+- `n`: Entity name string
+- `m`: Mass value
+- `c`: Charge value
+- `d`: Position vector pointer (can be NULL for origin)
+- `v`: Velocity vector pointer (can be NULL for stationary)
+- `a`: Acceleration vector pointer (can be NULL for zero acceleration)
+- `cor`: Coefficient of restitution
+- `rigid`: Rigid body flag
+- `s`: Static object flag
 
 Example usage:
 ```c
-double earth_pos[] = {0.0, 0.0, 0.0};
-double earth_vel[] = {0.0, 0.0, 0.0};
-double earth_acc[] = {0.0, 0.0, 0.0};
-double earth_quat[] = {1.0, 0.0, 0.0, 0.0}; // Identity orientation
-double earth_ang_vel[] = {0.0, 0.0, 7.292e-5}; // Earth's rotation rate
+Vector earth_pos = {0.0, 0.0, 0.0};
+Vector earth_vel = {0.0, 0.0, 0.0};
+Vector earth_acc = {0.0, 0.0, 0.0};
 
-Entity earth = new_entity("Earth", 5.972e24, 0.0, earth_pos, earth_vel, earth_acc,
-                         earth_quat, earth_ang_vel, 8.034e37, 0.3, true, false);
+Entity earth = new_entity("Earth", 5.972e24, 0.0, 
+                         &earth_pos, &earth_vel, &earth_acc,
+                         0.3, true, false);
 ```
 
-### Entity Operations
+### Accessor Functions
 
-#### Position Updates
+#### Position Access
 ```c
-void update_entity_position(Entity* entity, TimeFlow* time_flow);
+Vector* get_position(Entity* obj);
 ```
-Updates entity position and orientation based on current velocity, acceleration, and time step.
+Returns pointer to the position Vector for direct modification.
 
-#### Force Application
+#### Velocity Access
 ```c
-void apply_force_to_entity(Entity* entity, double force[3], double torque[3]);
+Vector* get_velocity(Entity* obj);
 ```
-Applies both linear force and rotational torque to an entity.
+Returns pointer to the velocity Vector for direct modification.
 
-#### Distance Calculations
+#### Acceleration Access
 ```c
-double get_euclidean_distance(Entity* entity1, Entity* entity2);
+Vector* get_acceleration(Entity* obj);
 ```
-Calculates the Euclidean distance between two entities in 3D space.
+Returns pointer to the acceleration Vector for direct modification.
+
+### Setter Functions
+
+#### Position Setter
+```c
+ErrorCode set_entity_position(Entity* obj, double x, double y, double z);
+```
+
+#### Velocity Setter
+```c
+ErrorCode set_entity_velocity(Entity* obj, double x, double y, double z);
+```
+
+#### Acceleration Setter
+```c
+ErrorCode set_entity_acceleration(Entity* obj, double x, double y, double z);
+```
+
+#### Angular Velocity Setter
+```c
+ErrorCode set_entity_angular_velocity(Entity* obj, double x, double y, double z);
+```
+
+#### Angular Acceleration Setter
+```c
+ErrorCode set_entity_angular_acceleration(Entity* obj, double x, double y, double z);
+```
+
+### Utility Functions
+
+#### `get_euclidean_distance()`
+```c
+double get_euclidean_distance(const Entity* obj_1, const Entity* obj_2);
+```
+Calculates the straight-line distance between two entities:
+
+```
+distance = √((x₂-x₁)² + (y₂-y₁)² + (z₂-z₁)²)
+```
+
+#### `get_linear_momentum()`
+```c
+void get_linear_momentum(const Entity* obj, Vector* result);
+```
+Computes the linear momentum vector:
+
+```
+p = m × v
+```
+
+where `p` is momentum, `m` is mass, and `v` is velocity.
+
+## EntityManager Class (C++)
+
+The EntityManager provides a high-level C++ interface for managing multiple entities.
+
+### Class Definition
+
+```cpp
+class EntityManager {
+private:
+    std::vector<Entity*> entities;
+    
+public:
+    EntityManager();
+    ~EntityManager();
+    
+    // Entity management
+    void addEntity(Entity* entity);
+    void addEntity(const std::string& name, double mass, double charge, 
+                   const Vector& position, const Vector& velocity,
+                   double radius = 0.5, bool is_static = false);
+    
+    bool removeEntity(const std::string& name);
+    bool removeEntity(Entity* entity);
+    void clearAll();
+    
+    // Entity lookup
+    Entity* findEntity(const std::string& name);
+    Entity* getEntity(size_t index);
+    size_t getEntityCount() const;
+    
+    // Batch operations
+    void updateAllPhysics(double delta_time);
+    void applyGravityField(double magnitude, const Vector& direction);
+    void applyElectricField(double magnitude, const Vector& direction);
+    void applyMagneticField(double magnitude, const Vector& direction);
+    
+    // Collision detection
+    void checkCollisions();
+    
+    // Serialization
+    bool saveToFile(const std::string& filename);
+    bool loadFromFile(const std::string& filename);
+    
+    // Iterator support
+    std::vector<Entity*>::iterator begin();
+    std::vector<Entity*>::iterator end();
+};
+```
+
+### Usage Example
+
+```cpp
+#include "include/core/entity_manager.h"
+
+int main() {
+    EntityManager manager;
+    
+    // Add entities
+    manager.addEntity("Ball1", 1.0, 0.0, {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, 0.5, false);
+    manager.addEntity("Ball2", 2.0, 0.0, {5.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}, 0.5, false);
+    
+    // Simulation loop
+    double dt = 0.016;
+    for (int i = 0; i < 1000; i++) {
+        manager.updateAllPhysics(dt);
+        manager.checkCollisions();
+    }
+    
+    // Iterate over entities
+    for (Entity* entity : manager) {
+        printf("%s: pos=(%.2f, %.2f, %.2f)\n", 
+               entity->name, 
+               entity->position.x, 
+               entity->position.y, 
+               entity->position.z);
+    }
+    
+    return 0;
+}
+```
 
 ## Rotational Dynamics
 
@@ -104,9 +267,23 @@ Calculates the Euclidean distance between two entities in 3D space.
 
 The entity system uses quaternions for orientation representation to avoid gimbal lock and provide smooth interpolation:
 
-- **Identity Quaternion**: [1.0, 0.0, 0.0, 0.0] represents no rotation
+- **Identity Quaternion**: `{w=1.0, x=0.0, y=0.0, z=0.0}` represents no rotation
 - **Normalization**: All orientation quaternions are automatically normalized
 - **Integration**: Angular velocity is integrated to update orientation over time
+
+### Quaternion Functions (from Quaternion.h)
+
+| Function | Description |
+|----------|-------------|
+| `quat_identity()` | Create identity quaternion |
+| `quat_create(w, x, y, z)` | Create quaternion from components |
+| `quat_from_axis_angle(angle, x, y, z)` | Create from axis-angle |
+| `quat_from_euler(yaw, pitch, roll)` | Create from Euler angles |
+| `quat_normalize(q)` | Normalize to unit length |
+| `quat_multiply(q1, q2)` | Compose two rotations |
+| `quat_conjugate(q)` | Get inverse rotation |
+| `quat_rotate_vector(q, vx, vy, vz, ...)` | Rotate a vector |
+| `quat_slerp(q1, q2, t)` | Spherical interpolation |
 
 ### Angular Motion Integration
 
@@ -131,110 +308,32 @@ advance_time(&tf, time_step);
 
 This integration ensures consistent time scaling across all physics calculations.
 
-#### Basic Properties
-- **name**: Human-readable identifier (max 255 characters)
-- **mass**: Object mass in kilograms (must be positive)
-- **charge**: Electric charge in coulombs (can be positive, negative, or zero)
+## Collision System
 
-#### Kinematic Properties
-- **position**: 3D Cartesian coordinates in meters
-- **velocity**: Velocity components in meters/second
-- **acceleration**: Acceleration components in meters/second²
+### Collision Detection
 
-#### Rotational Properties
-- **quaternion**: Orientation represented as [w, x, y, z] quaternion
-- **angular_velocity**: Angular velocity in radians/second
-- **angular_acceleration**: Angular acceleration in radians/second²
-- **moment_of_inertia**: Rotational inertia scalar
+The system provides sphere-based collision detection:
 
-#### Physical Behavior
-- **coefficient_of_restitution**: Elasticity coefficient (0.0 = perfectly inelastic, 1.0 = perfectly elastic)
-- **rigid_body**: Flag indicating rigid body behavior
-- **is_static**: Flag for immovable objects (infinite mass)
-
-## API Functions
-
-### Entity Creation
-
-#### `new_entity()`
 ```c
-struct Entity new_entity(const char* n, double m, double c,
-                        const double d[3], const double v[3],
-                        const double a[3], double cor, bool rigid, bool s);
+int check_sphere_collision(const Entity* obj_1, const Entity* obj_2);
 ```
 
-**Parameters:**
-- `n`: Entity name string
-- `m`: Mass value
-- `c`: Charge value
-- `d`: Position vector [x, y, z] (can be NULL for origin)
-- `v`: Velocity vector [vx, vy, vz] (can be NULL for stationary)
-- `a`: Acceleration vector [ax, ay, az] (can be NULL for zero acceleration)
-- `cor`: Coefficient of restitution
-- `rigid`: Rigid body flag
-- `s`: Static object flag
+### Collision Response
 
-**Initialization Details:**
-- Quaternion initialized to identity quaternion [1, 0, 0, 0]
-- Angular velocity and acceleration set to zero
-- Moment of inertia defaults to 1.0
-- Arrays are safely copied with null checks
-
-### Accessor Functions
-
-#### Position Access
 ```c
-inline double* get_position(Entity* obj);
-```
-Returns pointer to the position array for direct modification.
-
-#### Velocity Access
-```c
-inline double* get_velocity(Entity* obj);
-```
-Returns pointer to the velocity array for direct modification.
-
-#### Acceleration Access
-```c
-inline double* get_acceleration(Entity* obj);
-```
-Returns pointer to the acceleration array for direct modification.
-
-### Utility Functions
-
-#### `get_euclidean_distance()`
-```c
-double get_euclidean_distance(const Entity* obj_1, const Entity* obj_2);
-```
-Calculates the straight-line distance between two entities using the Euclidean distance formula:
-
-distance = √((x₂-x₁)² + (y₂-y₁)² + (z₂-z₁)²)
-
-
-
-#### `get_linear_momentum()`
-```c
-void get_linear_momentum(const Entity* obj, double result[3]);
-```
-Computes the linear momentum vector:
-
-p = m × v
-
-where `p` is momentum, `m` is mass, and `v` is velocity.
-
-### Collision System
-
-#### `process_collision()`
-```c
-void process_collision(Entity* obj_1, Entity* obj_2, double* loss);
+void resolve_sphere_collision(Entity* obj_1, Entity* obj_2);
+void apply_collision_response(Entity* entities, int count);
 ```
 
-**Collision Types Handled:**
-1. **Static-Dynamic Collision**: One object is static, the other is dynamic
-2. **Dynamic-Dynamic Collision**: Both objects are movable
-3. **Static-Static Collision**: No collision processing (returns immediately)
+### Entity Radius
 
-**Collision Algorithm:**
+```c
+double get_entity_radius(const Entity* entity);
+void set_entity_radius(Entity* entity, double radius);
+```
+
+### Collision Algorithm
+
 1. **Normal Vector Calculation**: Computes collision normal from position difference
 2. **Relative Velocity**: Calculates velocity along collision normal
 3. **Impulse Calculation**: Uses coefficient of restitution to compute collision impulse
@@ -244,7 +343,6 @@ void process_collision(Entity* obj_1, Entity* obj_2, double* loss);
 **Collision Formulas:**
 - **Impulse Magnitude**: `J = -(1 + e) × v_rel / (1/m₁ + 1/m₂)`
 - **Velocity Update**: `v₁' = v₁ - J/m₁ × n`, `v₂' = v₂ + J/m₂ × n`
-- **Energy Loss**: `ΔE = KE_before - KE_after`
 
 ## Physical Properties and Behaviors
 
@@ -271,9 +369,9 @@ void process_collision(Entity* obj_1, Entity* obj_2, double* loss);
 
 ### Creating a Basic Entity
 ```c
-double pos[3] = {0.0, 10.0, 0.0};
-double vel[3] = {5.0, 0.0, 0.0};
-Entity ball = new_entity("Ball", 1.0, 0.0, pos, vel, NULL, 0.8, true, false);
+Vector pos = {0.0, 10.0, 0.0};
+Vector vel = {5.0, 0.0, 0.0};
+Entity ball = new_entity("Ball", 1.0, 0.0, &pos, &vel, NULL, 0.8, true, false);
 ```
 
 ### Calculating Distance Between Entities
@@ -283,8 +381,16 @@ double distance = get_euclidean_distance(&entity1, &entity2);
 
 ### Processing Collisions
 ```c
-double energy_loss;
-process_collision(&ball1, &ball2, &energy_loss);
+if (check_sphere_collision(&ball1, &ball2)) {
+    resolve_sphere_collision(&ball1, &ball2);
+}
+```
+
+### Using EntityManager
+```cpp
+EntityManager manager;
+manager.addEntity("Particle", 1.0, 1.6e-19, {0, 0, 0}, {100, 0, 0});
+manager.updateAllPhysics(0.001);
 ```
 
 ## Coordinate System
@@ -295,14 +401,14 @@ process_collision(&ball1, &ball2, &energy_loss);
 - **Z-axis**: Forward direction (positive values)
 
 ### Quaternion Orientation
-- **Quaternion Format**: [w, x, y, z] where w is the scalar part
-- **Identity Quaternion**: [1, 0, 0, 0] represents no rotation
+- **Quaternion Format**: {w, x, y, z} where w is the scalar part
+- **Identity Quaternion**: {1, 0, 0, 0} represents no rotation
 - **Normalized**: All quaternions are automatically normalized
 
 ## Performance Considerations
 
 ### Memory Layout
-- Contiguous array storage for vector data
+- Vector and Quaternion types use simple structs for efficient memory layout
 - Inline accessor functions for performance
 - Stack allocation for entity creation
 
@@ -321,17 +427,21 @@ process_collision(&ball1, &ball2, &energy_loss);
 ### Field System
 - Electric field calculations based on charge
 - Gravitational field calculations based on mass
+- Magnetic field calculations based on charge and velocity
 
-## Error Handling and Validation
+## Error Handling
 
-### Input Validation
-- Null pointer checks for array parameters
-- Buffer overflow protection for name copying
-- Safe array initialization with fallbacks
+The entity system uses the ErrorCode enum defined in error_codes.h:
 
-### Edge Cases
-- Zero-mass objects handled appropriately
-- Infinite distances (division by zero protection)
-- Collision with static objects
+```c
+typedef enum {
+    SUCCESS = 0,
+    ERROR_NULL_POINTER,
+    ERROR_INVALID_PARAMETER,
+    // ... other error codes
+} ErrorCode;
+```
+
+Always check return values from setter functions to ensure operations completed successfully.
 
 This documentation provides a comprehensive reference for working with the Entity system in the CPhysics engine.

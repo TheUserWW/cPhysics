@@ -6,8 +6,22 @@ cmake_minimum_required(VERSION 3.10)
 
 project(CPhysics C CXX)
 
+# Set vcpkg toolchain if available
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+endif()
+
+# Set CMAKE_PREFIX_PATH to include vcpkg installed directory
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed")
+    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/x64-windows")
+endif()
+
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
+
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
 
 
 # Windows-specific configuration
@@ -74,6 +88,7 @@ set(CORE_HEADERS
         include/graphics/OpenGL/gl_camera.h
         include/graphics/OpenGL/gl_model.h
         include/graphics/stb_image.h
+        main.cpp
 )
 
 set(OTHER_HEADERS
@@ -160,8 +175,8 @@ target_link_libraries(CPhysics
         kernel32
 )
 
-# ========================
-# Copy resources to output directory
+# ======================== 
+# Copy resources to output directory 
 # ========================
 
 if(WIN32)
@@ -172,12 +187,12 @@ if(WIN32)
     )
     add_custom_command(TARGET CPhysics POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/bin/glfw3.dll"
+            "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/glfw3.dll"
             "${CMAKE_BINARY_DIR}/bin/glfw3.dll"
     )
     add_custom_command(TARGET CPhysics POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/bin/glew32d.dll"
+            "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/x64-windows/debug/bin/glew32d.dll"
             "${CMAKE_BINARY_DIR}/bin/glew32d.dll"
     )
 endif()

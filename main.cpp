@@ -9,35 +9,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-#define PHYSICS_SCALE 1e-9   // 调整物理尺度，使行星运动可见
-#define RENDER_SCALE 1e-9    // 渲染尺度，与物理尺度匹配
+#define PHYSICS_SCALE 1e-9
+#define RENDER_SCALE 1e-9
 
-// 物理场定义
-gravitational_field gravity_field = {
-    .magnitude = 9.8,      // 地球重力加速度
-    .direction = {0.0, -1.0, 0.0}
-};
-
-electric_field e_field = {
-    .magnitude = 5.0,      // 电场强度
-    .direction = {1.0, 0.0, 0.0}
-};
-
-magnetic_field b_field = {
-    .magnitude = 2.0,      // 磁场强度
-    .direction = {0.0, 0.0, 1.0},
-    .position = {0.0, 0.0, 0.0}
-};
-
-
-static void update_physics_with_manager(EntityManager& manager, double dt) {
-    // 先应用物理场（在加速度重置之前）
-    manager.applyGravityField(9.8, {0.0, -1.0, 0.0});
-    manager.applyElectricField(5.0, {1.0, 0.0, 0.0});
-    manager.applyMagneticField(2.0, {0.0, 0.0, 1.0});
-    
-    // 然后进行物理更新（包括加速度重置和运动计算）
+static void update_physics_binary(EntityManager& manager, double dt) {
     manager.updateAllPhysics(dt);
 }
 
@@ -48,7 +25,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(1920, 1080, "cPhysics Demo - Charged Particles", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "cPhysics Demo - Object Collision", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -99,7 +76,7 @@ int main(void)
     };
 
     Camera camera;
-    camera_init(&camera, 0.0f, 0.0f, 20.0f, 0.0f, 0.0f); // 调整相机位置，使其能看到两个球体
+    camera_init(&camera, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f);
     camera_set_global(&camera);
     float view[16];
     camera_update_view_matrix(view, &camera);
@@ -107,60 +84,41 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, camera_mouse_callback);
 
-    // 使用EntityManager管理实体
     EntityManager entity_manager;
     
-    Vector zero = {0, 0, 0};
+    double M1 = 1.0;
+    double M2 = 1.0;
+    double separation = 10.0;
+    double collision_speed = 5.0;
     
-    // 使用EntityManager添加实体
-    entity_manager.addEntity("Sun", 1.989e30, 0.0, 
-                           {0, 0, 0}, {0, 0, 0}, 
-                           10.0 * PHYSICS_SCALE, true);
+    printf("Object Collision Demo Parameters:\n");
+    printf("  Object A: Mass = %.2e kg, Position = %.2e m\n", M1, separation / 2.0);
+    printf("  Object B: Mass = %.2e kg, Position = %.2e m\n", M2, -separation / 2.0);
+    printf("  Initial separation: %.2e m\n", separation);
+    printf("  Collision speed: %.2e m/s\n", collision_speed);
     
-    entity_manager.addEntity("Planet", 5.972e24, 1.0,
-                           {1.5e11 * PHYSICS_SCALE, 0, 0}, {0, 0, 3e4 * PHYSICS_SCALE},
-                           1.0 * PHYSICS_SCALE, false);
+    entity_manager.addEntity("ObjectA", M1, 0.8, 
+                           {separation / 2.0, 0, 0}, {-collision_speed, 0, 0},
+                           1.0, false);
     
-    entity_manager.addEntity("NegCharge", 1e22, -1.0,
-                           {-1e11 * PHYSICS_SCALE, 0, 0}, {0, 2e4 * PHYSICS_SCALE, 0},
-                           0.5 * PHYSICS_SCALE, false);
-    
-    entity_manager.addEntity("Neutral", 1e22, 0.0,
-                           {0, 1e11 * PHYSICS_SCALE, 0}, {2e4 * PHYSICS_SCALE, 0, 0},
-                           0.5 * PHYSICS_SCALE, false);
-    
-    // 可以动态添加更多实体
-    entity_manager.addEntity("Extra", 1e21, 0.5,
-                           {0, -1e11 * PHYSICS_SCALE, 0}, {1e4 * PHYSICS_SCALE, 0, 0},
-                           0.3 * PHYSICS_SCALE, false);
+    entity_manager.addEntity("ObjectB", M2, 0.8, 
+                           {-separation / 2.0, 0, 0}, {collision_speed, 0, 0},
+                           1.0, false);
 
     double last_time = glfwGetTime();
-    double physics_dt = 3600.0; // 使用1小时作为物理时间步长，更适合行星运动
+    double physics_dt = 0.001;
     double accumulator = 0.0;
     int paused = 0;
 
-    printf("=== cPhysics Demo - EntityManager Enhanced Physics ===\n");
-    printf("Using EntityManager with vector-based entity management\n");
+    printf("\n=== cPhysics Demo - Object Collision ===\n");
+    printf("Simulating two objects colliding with each other\n");
     printf("Entity count: %zu\n", entity_manager.getEntityCount());
-    printf("\nSimulating multiple bodies with different physical properties:\n");
     
-    // 显示所有实体的信息
-    size_t index = 0;
     for (Entity* entity : entity_manager) {
-        const char* color_desc = "";
-        if (entity->charge > 0) color_desc = "(red)";
-        else if (entity->charge < 0) color_desc = "(blue)";
-        else color_desc = "(green)";
-        
-        printf("  %s %s: Mass=%.1e, Charge=%.1f\n", 
-               entity->name, color_desc, entity->mass, entity->charge);
-        index++;
+        printf("  %s: Mass=%.2e kg, Radius=%.1f\n", 
+               entity->name, entity->mass, entity->coefficient_of_restitution);
     }
     
-    printf("\nApplied Physics Fields:\n");
-    printf("  Gravity: 9.8 m/s² downward\n");
-    printf("  Electric Field: 5.0 N/C rightward\n");
-    printf("  Magnetic Field: 2.0 T upward\n");
     printf("\nControls:\n");
     printf("  WASD     - Move camera\n");
     printf("  Q/E      - Move up/down\n");
@@ -193,31 +151,22 @@ int main(void)
         if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !r_pressed) {
             r_pressed = 1;
             
-            // 使用EntityManager重置所有实体
             entity_manager.clearAll();
             
-            // 重新添加实体
-            entity_manager.addEntity("Sun", 1.989e30, 0.0, 
-                                   {0, 0, 0}, {0, 0, 0}, 
-                                   10.0 * PHYSICS_SCALE, true);
+            double M1_reset = 1.0;
+            double M2_reset = 1.0;
+            double separation_reset = 10.0;
+            double collision_speed_reset = 5.0;
             
-            entity_manager.addEntity("Planet", 5.972e24, 1.0,
-                                   {1.5e11 * PHYSICS_SCALE, 0, 0}, {0, 0, 3e4 * PHYSICS_SCALE},
-                                   1.0 * PHYSICS_SCALE, false);
+            entity_manager.addEntity("ObjectA", M1_reset, 0.8, 
+                                   {separation_reset / 2.0, 0, 0}, {-collision_speed_reset, 0, 0},
+                                   1.0, false);
             
-            entity_manager.addEntity("NegCharge", 1e22, -1.0,
-                                   {-1e11 * PHYSICS_SCALE, 0, 0}, {0, 2e4 * PHYSICS_SCALE, 0},
-                                   0.5 * PHYSICS_SCALE, false);
+            entity_manager.addEntity("ObjectB", M2_reset, 0.8, 
+                                   {-separation_reset / 2.0, 0, 0}, {collision_speed_reset, 0, 0},
+                                   1.0, false);
             
-            entity_manager.addEntity("Neutral", 1e22, 0.0,
-                                   {0, 1e11 * PHYSICS_SCALE, 0}, {2e4 * PHYSICS_SCALE, 0, 0},
-                                   0.5 * PHYSICS_SCALE, false);
-            
-            entity_manager.addEntity("Extra", 1e21, 0.5,
-                                   {0, -1e11 * PHYSICS_SCALE, 0}, {1e4 * PHYSICS_SCALE, 0, 0},
-                                   0.3 * PHYSICS_SCALE, false);
-            
-            printf("[RESET] Entity count: %zu\n", entity_manager.getEntityCount());
+            printf("[RESET] Collision simulation restored\n");
         }
         if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE) {
             r_pressed = 0;
@@ -230,7 +179,7 @@ int main(void)
         if (!paused) {
             accumulator += frame_time;
             while (accumulator >= physics_dt) {
-                update_physics_with_manager(entity_manager, physics_dt);
+                update_physics_binary(entity_manager, physics_dt);
                 accumulator -= physics_dt;
             }
         }

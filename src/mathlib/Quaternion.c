@@ -1,5 +1,10 @@
+#define _USE_MATH_DEFINES
 #include "../../include/mathlib/Quaternion.h"
 #include <math.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 Quaternion quat_identity() {
     Quaternion q = {1.0f, 0.0f, 0.0f, 0.0f};

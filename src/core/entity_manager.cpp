@@ -24,7 +24,7 @@ EntityManager::~EntityManager() {
 
 void EntityManager::addEntity(Entity* entity) {
     if (entity) {
-        entities.push_back(entity);
+        entities.emplace_back(entity);
     }
 }
 
@@ -42,7 +42,7 @@ void EntityManager::addEntity(const std::string& name, double mass, double charg
     entity->is_static = is_static;
     entity->coefficient_of_restitution = radius;
     
-    entities.push_back(entity);
+    entities.emplace_back(entity);
 }
 
 
@@ -90,14 +90,12 @@ size_t EntityManager::getEntityCount() const {
 }
 
 void EntityManager::updateAllPhysics(double delta_time) {
-    // 应用万有引力
     for (size_t i = 0; i < entities.size(); i++) {
         for (size_t j = i + 1; j < entities.size(); j++) {
             apply_universal_gravitation(entities[i], entities[j]);
         }
     }
-    
-    // 更新所有实体的运动
+
     for (Entity* entity : entities) {
         if (!entity->is_static) {
             // 更新速度：v = v0 + a * dt
@@ -156,7 +154,21 @@ void EntityManager::applyMagneticField(double magnitude, const Vector& direction
 void EntityManager::checkCollisions() {
     for (size_t i = 0; i < entities.size(); i++) {
         for (size_t j = i + 1; j < entities.size(); j++) {
+            double dist = get_euclidean_distance(entities[i], entities[j]);
+            double r1 = get_entity_radius(entities[i]);
+            double r2 = get_entity_radius(entities[j]);
+            double threshold = r1 + r2;
+            
+            static int frame_count = 0;
+            frame_count++;
+            if (frame_count % 1000 == 0) {
+                printf("[DEBUG] Distance: %.6f, r1: %.6f, r2: %.6f, threshold: %.6f, colliding: %d\n",
+                       dist, r1, r2, threshold, dist < threshold);
+            }
+            
             if (check_sphere_collision(entities[i], entities[j])) {
+                printf("[COLLISION] Detected between %s and %s!\n", 
+                       entities[i]->name, entities[j]->name);
                 resolve_sphere_collision(entities[i], entities[j]);
             }
         }

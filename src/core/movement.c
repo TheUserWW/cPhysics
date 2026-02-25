@@ -104,14 +104,11 @@ void update_rotation(Entity* obj, double dt) {
 double get_entity_radius(const Entity* entity) {
     if (!entity) return 0.0;
     
-    // 使用coefficient_of_restitution字段存储半径信息
-    // 如果coefficient_of_restitution > 0.1，则认为是半径，否则使用默认值
-    if (entity->coefficient_of_restitution > 0.1) {
+    if (entity->coefficient_of_restitution > 0.0) {
         return entity->coefficient_of_restitution;
     }
     
-    // 默认半径基于质量（简单估算）
-    return pow(entity->mass / 1000.0, 1.0/3.0) * 0.1;
+    return 0.5;
 }
 
 // Set sphere radius

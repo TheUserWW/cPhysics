@@ -1,35 +1,33 @@
 # CPhysics Engine
 
-A lightweight physics simulation engine written in C. This library provides fundamental physics calculations including gravitational forces, electric forces, and basic entity movement simulations.
+A lightweight physics simulation engine written in C/C++. This library provides fundamental physics calculations including gravitational forces, electric forces, and basic entity movement simulations.
 
 ## Features
 
 - **Advanced Entity System**: Create and manage physical entities with mass, charge, position, velocity, acceleration, and rotational properties
 - **Universal Gravitation**: Calculate gravitational forces between celestial bodies
 - **Electrostatic Forces**: Compute electric forces between charged particles
-- **3D Physics**: Support for 3-dimensional position, velocity, and acceleration vectors
+- **Magnetic Field Support**: Apply magnetic forces using Lorentz force law
+- **3D Physics**: Support for 3-dimensional position, velocity, and acceleration vectors using Vector and Quaternion types
+- **Entity Manager**: C++ class for managing multiple entities with batch operations and collision detection
 - **OpenGL Graphics Support**: Real-time 3D visualization with camera, lighting, and texture support
-- **Mathematical Library**: Comprehensive vector operations and mathematical utilities
+- **Model Loading**: OBJ model loading support via custom Model class
+- **Sphere Rendering**: Built-in sphere renderer for physics visualization
+- **Mathematical Library**: Comprehensive vector operations and quaternion utilities
 - **Skybox Rendering**: High dynamic range (HDR) skybox support for realistic environments
-- **Collision Detection**: Basic collision detection between entities
+- **Collision Detection**: Sphere collision detection and response between entities
 - **Physics Logging**: Comprehensive logging system for simulation data
 - **CMake Build System**: Easy compilation and integration with other projects
-- **Cross-Platform**: Compatible with Windows, Linux, and macOS
+- **vcpkg Integration**: Modern dependency management with vcpkg
 
 ## Project Structure
 ```
 CPhysics/
-├── Dependencies/         # Third-party libraries
-│   ├── GLEW/           # OpenGL Extension Wrangler Library
-│   ├── include/        # Header files for dependencies
-│   │   ├── GLFW/       # GLFW headers
-│   │   └── stb_image.h # Image loading library
-│   └── lib-mingw-w64/  # Precompiled libraries for MinGW-w64
 ├── include/             # Header files
-│   ├── basic_obj/      # Basic 3D object definitions
 │   ├── core/           # Core physics components
 │   │   ├── collider.h  # Collision detection
 │   │   ├── entity.h    # Entity definitions
+│   │   ├── entity_manager.h  # Entity management (C++)
 │   │   ├── field.h     # Field calculations
 │   │   ├── movement.h  # Movement and kinematics
 │   │   └── time_flow.h # Time flow management
@@ -37,11 +35,13 @@ CPhysics/
 │   │   └── OpenGL/     # OpenGL implementations
 │   │       ├── gl_camera.h  # Camera system
 │   │       ├── gl_cube.h    # Cube rendering
+│   │       ├── gl_model.h   # OBJ model loading (C++)
 │   │       ├── gl_skybox.h  # Skybox rendering
-│   │       ├── gl_sphere.h  # Sphere rendering
+│   │       ├── gl_sphere.hpp # Sphere rendering (C++)
 │   │       └── gl_texture.h # Texture management
 │   ├── mathlib/        # Mathematical utilities
-│   │   └── Vector.h    # Vector operations
+│   │   ├── Vector.h    # Vector operations
+│   │   └── Quaternion.h # Quaternion operations
 │   ├── cphysics.h      # Main library header
 │   ├── constant.h      # Physical constants
 │   ├── error_codes.h   # Error code definitions
@@ -51,22 +51,22 @@ CPhysics/
 │   ├── graphics/       # Graphics implementations
 │   │   └── OpenGL/     # OpenGL implementations
 │   ├── mathlib/        # Mathematical utilities
-│   │   └── Vector.c    # Vector operations
-│   ├── cube.c          # Cube implementation
-│   ├── cylinder.c     # Cylinder implementation
-│   ├── plog.c         # Physics logging implementation
-│   └── pyramid.c      # Pyramid implementation
+│   └── plog.c         # Physics logging implementation
 ├── resources/          # Resource files
-│   └── skybox/        # Skybox HDR textures
+│   ├── models/        # 3D models (OBJ format)
+│   ├── skybox/        # Skybox HDR textures
+│   └── textures/      # Texture files
 ├── doc/               # Documentation
 │   ├── Entity.md      # Entity system documentation
 │   ├── Field.md       # Field calculations documentation
 │   ├── Formulas.md    # Physics formulas reference
 │   └── Movement.md    # Movement system documentation
+├── vcpkg_installed/   # vcpkg dependencies
 ├── CMakeLists.txt     # Build configuration
+├── vcpkg.json         # vcpkg manifest
+├── vcpkg-configuration.json # vcpkg configuration
 ├── LICENSE            # MIT License
-├── gitignore          # Git ignore rules
-├── main.c             # Example usage and test suite
+├── main.cpp           # Demo application
 └── readme.md          # This file
 ```
 
@@ -75,12 +75,27 @@ CPhysics/
 ### Prerequisites
 
 - CMake (version 3.10 or higher)
-- C compiler (GCC, Clang, or MSVC)
-- Make or Ninja build system
+- C/C++ compiler (GCC, Clang, or MSVC)
+- vcpkg package manager
 - OpenGL libraries (for graphics features)
-- GLFW (for window and input management)
-- GLEW (for OpenGL extensions)
-- stb_image (for texture loading)
+
+### Dependencies (via vcpkg)
+
+The project uses vcpkg for dependency management. Required packages:
+- GLFW (window and input management)
+- GLEW (OpenGL extensions)
+
+```bash
+# Install vcpkg if not already installed
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.bat  # Windows
+# or ./bootstrap-vcpkg.sh  # Linux/macOS
+
+# Install dependencies
+./vcpkg install glfw3:x64-windows
+./vcpkg install glew:x64-windows
+```
 
 ### Building the Project
 
@@ -91,60 +106,51 @@ cd cPhysics
 # Create build directory
 mkdir build && cd build
 
-# Configure with CMake
-cmake ..
+# Configure with CMake (specify vcpkg toolchain)
+cmake .. -DCMAKE_TOOLCHAIN_FILE=[vcpkg-root]/scripts/buildsystems/vcpkg.cmake
 
 # Build the project
 cmake --build .
 
-# Run the test suite
+# Run the demo
 ./cPhysics
 ```
 
 ### Example Usage
 
-```c
+```cpp
 #include "include/cphysics.h"
+#include "include/core/entity_manager.h"
 
 int main(void) {
     // Initialize physics logging
     plog_init("simulation.log");
     
-    // Create celestial bodies with rotational properties
-    double earth_pos[] = {0.0, 0.0, 0.0};
-    double earth_vel[] = {0.0, 0.0, 0.0};
-    double earth_acc[] = {0.0, 0.0, 0.0};
-    double earth_quat[] = {1.0, 0.0, 0.0, 0.0}; // Identity quaternion
-    double earth_ang_vel[] = {0.0, 0.0, 7.292e-5}; // Earth's rotation
+    // Create entity manager
+    EntityManager entity_manager;
     
-    Entity earth = new_entity("Earth", 5.972e24, 0.0, earth_pos, earth_vel, earth_acc, 
-                             earth_quat, earth_ang_vel, 0.0, 1.0, true, false);
+    // Add entities using the manager
+    entity_manager.addEntity("Earth", 5.972e24, 0.0, 
+                            {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0},
+                            6371000.0, false);
     
-    double moon_pos[] = {3.844e8, 0.0, 0.0};
-    double moon_vel[] = {0.0, 1022.0, 0.0};
-    double moon_quat[] = {1.0, 0.0, 0.0, 0.0};
-    
-    Entity moon = new_entity("Moon", 7.348e22, 0.0, moon_pos, moon_vel, earth_acc,
-                            moon_quat, earth_ang_vel, 0.0, 1.0, true, false);
-    
-    // Set up time flow with 1:1 time scaling
-    TimeFlow tf = new_time_flow(1.0, 0.0, 0.0);
+    entity_manager.addEntity("Moon", 7.348e22, 0.0,
+                            {3.844e8, 0.0, 0.0}, {0.0, 1022.0, 0.0},
+                            1737400.0, false);
     
     // Simulation loop
+    double dt = 0.001;
     for (int step = 0; step < 1000; step++) {
-        // Calculate gravitational force
-        apply_universal_gravitation(&earth, &moon);
+        // Update all physics
+        entity_manager.updateAllPhysics(dt);
         
-        // Update positions based on forces
-        update_entity_position(&earth, &tf);
-        update_entity_position(&moon, &tf);
+        // Check for collisions
+        entity_manager.checkCollisions();
         
-        // Log simulation state
-        plog_entity_state(&earth, step);
-        plog_entity_state(&moon, step);
-        
-        // Advance time
-        advance_time(&tf, 1.0);
+        // Log state
+        for (Entity* entity : entity_manager) {
+            plog_entity_state(entity, step);
+        }
     }
     
     // Clean up
@@ -160,19 +166,31 @@ int main(void) {
 
 #### Entity Management
 - `new_entity()`: Create a new physical entity with rotational properties
-- `update_entity_position()`: Update entity position and orientation based on forces and time
+- `get_position()`, `get_velocity()`, `get_acceleration()`: Access entity state
+- `set_entity_position()`, `set_entity_velocity()`: Modify entity state
 - `get_euclidean_distance()`: Calculate distance between two entities
-- `apply_force_to_entity()`: Apply external force to an entity
+- `get_linear_momentum()`: Calculate linear momentum vector
 
 #### Physics Calculations
 - `apply_universal_gravitation()`: Apply gravitational force between two entities
 - `apply_electric_force()`: Apply electric force between charged particles
-- `calculate_net_force()`: Calculate net force acting on an entity
+- `apply_force()`: Apply arbitrary force to an entity
+- `apply_torque()`: Apply torque to an entity
+
+#### Field System
+- `apply_gravitational_field()`: Apply uniform gravitational field
+- `apply_electric_field()`: Apply uniform electric field
+- `apply_magnetic_field()`: Apply magnetic field using Lorentz force
 
 #### Time Management
 - `new_time_flow()`: Create a new time flow configuration
 - `advance_time()`: Advance simulation time
 - `get_simulation_time()`: Get current simulation time
+
+#### Collision System
+- `check_sphere_collision()`: Check collision between two spherical entities
+- `resolve_sphere_collision()`: Resolve collision between entities
+- `apply_collision_response()`: Apply collision response to entity array
 
 #### Logging System
 - `plog_init()`: Initialize physics logging system
@@ -186,12 +204,12 @@ typedef struct Entity {
     char name[256];                    // Entity identifier
     double mass;                       // Mass in kilograms (kg)
     double charge;                     // Electric charge in coulombs (C)
-    double position[3];                // 3D position vector (x, y, z)
-    double velocity[3];                // 3D velocity vector (vx, vy, vz)
-    double acceleration[3];            // 3D acceleration vector (ax, ay, az)
-    double quaternion[4];              // Orientation quaternion (w, x, y, z)
-    double angular_velocity[3];        // Angular velocity vector (ωx, ωy, ωz)
-    double angular_acceleration[3];    // Angular acceleration vector (αx, αy, αz)
+    Vector position;                   // 3D position vector
+    Vector velocity;                   // 3D velocity vector
+    Vector acceleration;               // 3D acceleration vector
+    Quaternion quaternion;             // Orientation quaternion
+    Vector angular_velocity;           // Angular velocity vector
+    Vector angular_acceleration;       // Angular acceleration vector
     double moment_of_inertia;          // Moment of inertia scalar
     double coefficient_of_restitution; // Elasticity coefficient (0.0-1.0)
     bool rigid_body;                   // Rigid body flag
@@ -199,36 +217,90 @@ typedef struct Entity {
 } Entity;
 ```
 
+### Vector Structure
+
+```c
+typedef struct Vector {
+    double x;
+    double y;
+    double z;
+} Vector;
+```
+
+### Quaternion Structure
+
+```c
+typedef struct {
+    float w;  // Scalar (real) component
+    float x;  // i-component
+    float y;  // j-component
+    float z;  // k-component
+} Quaternion;
+```
+
+### EntityManager Class (C++)
+
+```cpp
+class EntityManager {
+public:
+    void addEntity(const std::string& name, double mass, double charge, 
+                   const Vector& position, const Vector& velocity,
+                   double radius = 0.5, bool is_static = false);
+    bool removeEntity(const std::string& name);
+    Entity* findEntity(const std::string& name);
+    size_t getEntityCount() const;
+    
+    void updateAllPhysics(double delta_time);
+    void applyGravityField(double magnitude, const Vector& direction);
+    void applyElectricField(double magnitude, const Vector& direction);
+    void applyMagneticField(double magnitude, const Vector& direction);
+    void checkCollisions();
+    
+    bool saveToFile(const std::string& filename);
+    bool loadFromFile(const std::string& filename);
+    
+    // Iterator support
+    std::vector<Entity*>::iterator begin();
+    std::vector<Entity*>::iterator end();
+};
+```
+
 ## Physical Constants
 
 The library includes commonly used physical constants:
 
 - Gravitational constant (G): 6.67430e-11 m³/kg/s²
-- Coulomb's constant (k): 8.987551787e9 N·m²/C²
-- Elementary charge (e): 1.602176634e-19 C
+- Coulomb's constant (K): 8.987551787e9 N·m²/C²
+- Speed of light (c): 3e8 m/s
+- Pi (π): 3.14159265358979323846
 
-## Testing
+## Demo Application
 
-The project includes a comprehensive test suite in `main.c` that demonstrates:
+The project includes a demo application in `main.cpp` that demonstrates:
 
-1. Entity creation and management with rotational properties
-2. Gravitational force calculations (Earth-Moon system)
-3. Electrostatic force calculations (proton-electron system)
-4. Rotational dynamics and quaternion operations
-5. Time flow management and simulation control
-6. Physics logging and data output
-7. Distance calculations and collision detection
+1. OpenGL window creation and rendering
+2. Entity creation and management with EntityManager
+3. Sphere collision simulation
+4. Camera controls (WASD + mouse)
+5. HDR skybox rendering
+6. OBJ model loading and rendering
+7. Real-time physics updates
 
-Run the tests with:
-```bash
-./CPhysics
-```
+### Demo Controls
+- **WASD** - Move camera
+- **Q/E** - Move up/down
+- **Mouse** - Look around
+- **SPACE** - Pause/Resume simulation
+- **R** - Reset simulation
+- **ESC** - Exit
 
 ## Documentation
 
 Detailed documentation is available in the `doc/` directory:
 
 - [Entity System Documentation](doc/Entity.md) - Complete guide to entity management
+- [Field System Documentation](doc/Field.md) - Field calculations and applications
+- [Movement System Documentation](doc/Movement.md) - Movement and rotation dynamics
 - [Physics Formulas Reference](doc/Formulas.md) - Mathematical foundations of the engine
 
 ## Advanced Features
@@ -249,6 +321,12 @@ Detailed documentation is available in the `doc/` directory:
 - Simulation data export
 - Debugging and analysis support
 
+### Graphics System
+- Camera system with mouse look
+- Sphere rendering for physics visualization
+- OBJ model loading support
+- HDR skybox rendering
+
 ## License
 
 This project is open source and available under the MIT License.
@@ -260,13 +338,9 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 ## Future Development
 
 Planned features include:
-- Magnetic field calculations
-- Advanced collision detection and response
+- Advanced collision detection (AABB, OBB)
 - Multi-body simulations with N-body problem solvers
 - Numerical integration methods (Runge-Kutta, Verlet)
-- Visualization support and real-time rendering
 - Fluid dynamics simulations
 - Thermodynamic systems
 - Quantum mechanics extensions
-
-

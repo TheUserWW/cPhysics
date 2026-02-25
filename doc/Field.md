@@ -22,19 +22,29 @@ Applies magnetic forces to moving charged objects based on the Lorentz force law
 ```c
 typedef struct gravitational_field {
     double magnitude;      // Gravitational field strength in m/s²
-    double direction[3];   // Unit direction vector (x, y, z)
+    Vector direction;      // Unit direction vector
 } gravitational_field;
 
 typedef struct electric_field {
     double magnitude;      // Electric field strength in N/C (Newtons per Coulomb)
-    double direction[3];   // Unit direction vector (x, y, z)
+    Vector direction;      // Unit direction vector
 } electric_field;
 
 typedef struct magnetic_field {
     double magnitude;      // Magnetic field strength in Tesla (T)
-    double direction[3];   // Unit direction vector (x, y, z)
-    double position[3];    // Field source position in meters (for future use)
+    Vector direction;      // Unit direction vector
+    Vector position;       // Field source position in meters (for future use)
 } magnetic_field;
+```
+
+### Vector Type
+
+```c
+typedef struct Vector {
+    double x;
+    double y;
+    double z;
+} Vector;
 ```
 
 ### Error Handling
@@ -55,10 +65,15 @@ typedef enum {
 
 **Purpose**: Applies gravitational acceleration to an entity.
 
+**Signature**:
+```c
+FieldErrorCode apply_gravitational_field(Entity* obj, const gravitational_field* g);
+```
+
 **Physics Formula**:
-
+```
 a = g * direction
-
+```
 
 **Parameters**:
 - `obj`: Pointer to target Entity object
@@ -73,7 +88,9 @@ a = g * direction
 **Usage Example**:
 ```c
 gravitational_field gravity = {9.8, {0, -1, 0}};  // Downward gravity
-Entity ball = new_entity("Ball", 1.0, 0.0, /* ... */);
+Vector pos = {0, 0, 0};
+Vector vel = {0, 0, 0};
+Entity ball = new_entity("Ball", 1.0, 0.0, &pos, &vel, NULL, 0.8, true, false);
 FieldErrorCode result = apply_gravitational_field(&ball, &gravity);
 ```
 
@@ -81,10 +98,15 @@ FieldErrorCode result = apply_gravitational_field(&ball, &gravity);
 
 **Purpose**: Applies electric force acceleration to a charged entity.
 
+**Signature**:
+```c
+FieldErrorCode apply_electric_field(Entity* obj, const electric_field* e);
+```
+
 **Physics Formula**:
-
+```
 a = (q * E) / m * direction
-
+```
 
 **Parameters**:
 - `obj`: Pointer to target Entity object
@@ -100,7 +122,9 @@ a = (q * E) / m * direction
 **Usage Example**:
 ```c
 electric_field e_field = {1000.0, {1, 0, 0}};  // 1000 N/C rightward field
-Entity electron = new_entity("Electron", 9.1e-31, -1.6e-19, /* ... */);
+Vector pos = {0, 0, 0};
+Vector vel = {0, 0, 0};
+Entity electron = new_entity("Electron", 9.1e-31, -1.6e-19, &pos, &vel, NULL, 1.0, true, false);
 FieldErrorCode result = apply_electric_field(&electron, &e_field);
 ```
 
@@ -108,11 +132,16 @@ FieldErrorCode result = apply_electric_field(&electron, &e_field);
 
 **Purpose**: Applies magnetic force acceleration using Lorentz force law.
 
-**Physics Formula**:
+**Signature**:
+```c
+FieldErrorCode apply_magnetic_field(Entity* obj, const magnetic_field* b);
+```
 
+**Physics Formula**:
+```
 F = q(v × B)
 a = F / m = (q * (v × B)) / m
-
+```
 
 **Parameters**:
 - `obj`: Pointer to target Entity object
@@ -128,16 +157,17 @@ a = F / m = (q * (v × B)) / m
 
 **Cross Product Calculation**:
 ```c
-cross_product[0] = vy * Bz - vz * By
-cross_product[1] = vz * Bx - vx * Bz
-cross_product[2] = vx * By - vy * Bx
+cross_product.x = vy * Bz - vz * By
+cross_product.y = vz * Bx - vx * Bz
+cross_product.z = vx * By - vy * Bx
 ```
 
 **Usage Example**:
 ```c
 magnetic_field b_field = {0.5, {0, 0, 1}, {0, 0, 0}};  // 0.5T upward field
-Entity proton = new_entity("Proton", 1.67e-27, 1.6e-19, /* ... */);
-set_entity_velocity(&proton, 1000.0, 0.0, 0.0);  // Moving right at 1000 m/s
+Vector pos = {0, 0, 0};
+Vector vel = {1000, 0, 0};
+Entity proton = new_entity("Proton", 1.67e-27, 1.6e-19, &pos, &vel, NULL, 1.0, true, false);
 FieldErrorCode result = apply_magnetic_field(&proton, &b_field);
 ```
 
@@ -161,7 +191,7 @@ FieldErrorCode result = apply_magnetic_field(&proton, &b_field);
 ## Integration with Other Systems
 
 ### Entity System
-- Fields modify Entity's acceleration vectors
+- Fields modify Entity's acceleration vectors (Vector type)
 - Works with both static and dynamic entities
 - Respects entity properties (mass, charge, static flag)
 
@@ -200,8 +230,75 @@ if (result != FIELD_SUCCESS) {
         case FIELD_ERROR_STATIC_OBJECT:
             printf("Warning: Cannot apply field to static object\n");
             break;
-        // Handle other error cases
+        case FIELD_ERROR_INVALID_MASS:
+            printf("Error: Invalid mass value\n");
+            break;
+        case FIELD_ERROR_INVALID_CHARGE:
+            printf("Error: Invalid charge value\n");
+            break;
     }
+}
+```
+
+## Using with EntityManager
+
+The EntityManager class provides batch field operations:
+
+```cpp
+#include "include/core/entity_manager.h"
+
+EntityManager manager;
+
+// Add entities
+manager.addEntity("Particle1", 1.0, 1.6e-19, {0, 0, 0}, {100, 0, 0});
+manager.addEntity("Particle2", 1.0, -1.6e-19, {1, 0, 0}, {-100, 0, 0});
+
+// Apply fields to all entities
+manager.applyGravityField(9.8, {0, -1, 0});
+manager.applyElectricField(1000.0, {1, 0, 0});
+manager.applyMagneticField(0.5, {0, 0, 1});
+```
+
+## Vector Operations
+
+The field system uses Vector operations from mathlib/Vector.h:
+
+```c
+double dot_product(const Vector a, const Vector b);
+Vector cross_product(const Vector a, const Vector b);
+double normalize(const Vector a);
+```
+
+## Complete Example
+
+```c
+#include "include/cphysics.h"
+#include "include/core/field.h"
+
+int main() {
+    // Create a charged particle
+    Vector pos = {0, 0, 0};
+    Vector vel = {1000, 0, 0};
+    Entity particle = new_entity("Proton", 1.67e-27, 1.6e-19, 
+                                 &pos, &vel, NULL, 1.0, true, false);
+    
+    // Define fields
+    gravitational_field gravity = {9.8, {0, -1, 0}};
+    electric_field e_field = {1000.0, {1, 0, 0}};
+    magnetic_field b_field = {0.5, {0, 0, 1}, {0, 0, 0}};
+    
+    // Apply fields
+    apply_gravitational_field(&particle, &gravity);
+    apply_electric_field(&particle, &e_field);
+    apply_magnetic_field(&particle, &b_field);
+    
+    // The particle's acceleration is now modified
+    printf("Acceleration: (%.2e, %.2e, %.2e)\n", 
+           particle.acceleration.x,
+           particle.acceleration.y,
+           particle.acceleration.z);
+    
+    return 0;
 }
 ```
 
