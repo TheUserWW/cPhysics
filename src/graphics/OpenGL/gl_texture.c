@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "graphics/stb_image.h"
 
 Texture* load_texture(const char* filepath) {
     Texture* texture = (Texture*)malloc(sizeof(Texture));

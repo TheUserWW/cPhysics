@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
-#include "stb_image.h"
+#include "graphics/stb_image.h"
 
 static const char* skybox_vertex_shader = 
 "#version 330 core\n"

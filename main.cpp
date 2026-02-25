@@ -5,6 +5,7 @@
 #include "include/graphics/OpenGL/gl_skybox.h"
 #include "include/graphics/OpenGL/gl_camera.h"
 #include "include/core/entity_manager.h"
+#include "include/graphics/OpenGL/gl_model.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,6 +77,15 @@ int main(void)
         printf("Warning: Failed to create skybox renderer\n");
     }
 
+    Model* appleModel = new Model("resources/models/Apple.obj");
+    if (appleModel->loadModel()) {
+        printf("Successfully loaded Apple model\n");
+    } else {
+        printf("Failed to load Apple model\n");
+        delete appleModel;
+        appleModel = nullptr;
+    }
+
     float aspect = 1920.0f / 1080.0f;
     float fov = 45.0f;
     float near = 0.1f;
@@ -125,8 +135,7 @@ int main(void)
                            0.3 * PHYSICS_SCALE, false);
 
     double last_time = glfwGetTime();
-    double physics_dt = 0.01; // 物理时间步长（秒），更小的值更精确但更耗性能
-    double time_scale = 3600.0; // 时间缩放因子：1帧 = 1小时物理时间
+    double physics_dt = 3600.0; // 使用1小时作为物理时间步长，更适合行星运动
     double accumulator = 0.0;
     int paused = 0;
 
@@ -219,7 +228,7 @@ int main(void)
         }
 
         if (!paused) {
-            accumulator += frame_time * time_scale;  // 应用时间缩放
+            accumulator += frame_time;
             while (accumulator >= physics_dt) {
                 update_physics_with_manager(entity_manager, physics_dt);
                 accumulator -= physics_dt;
@@ -235,6 +244,17 @@ int main(void)
 
         if (skybox) {
             render_skybox(skybox, view, projection);
+        }
+
+        if (appleModel) {
+            float modelMatrix[16] = {
+                0.1f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.1f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.1f, 0.0f,
+                5.0f, 0.0f, 0.0f, 1.0f
+            };
+            float appleColor[3] = {1.0f, 0.3f, 0.2f};
+            appleModel->render(view, projection, modelMatrix, appleColor);
         }
 
         GLuint proj_loc = glGetUniformLocation(renderer->shader_program, "projection");
@@ -254,6 +274,10 @@ int main(void)
 
     if (skybox) {
         destroy_skybox_renderer(skybox);
+    }
+    if (appleModel) {
+        appleModel->cleanup();
+        delete appleModel;
     }
     destroy_sphere_renderer(renderer);
     glfwTerminate();

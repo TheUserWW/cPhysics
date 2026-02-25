@@ -1,0 +1,9 @@
+{
+  "name": "cphysics",
+  "version": "1.0.0",
+  "description": "A physics simulation library with OpenGL graphics",
+  "dependencies": [
+    "glfw3",
+    "glew"
+  ]
+}

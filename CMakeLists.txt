@@ -1,3 +1,7 @@
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+set(VCPKG_APPLOCAL_DEPS OFF)
+
 cmake_minimum_required(VERSION 3.10)
 
 project(CPhysics C CXX)
@@ -5,34 +9,19 @@ project(CPhysics C CXX)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 
-# ========================
-# Dependencies: GLFW and GLEW
-# ========================
 
-set(DEPENDENCIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Dependencies")
-
-# GLEW
-set(GLEW_DIR "${DEPENDENCIES_DIR}/GLEW")
-
-# GLFW
-set(GLFW_INCLUDE_DIR "${DEPENDENCIES_DIR}/include")
-set(GLFW_LIB_DIR "${DEPENDENCIES_DIR}/lib-mingw-w64")
-
-# Select GLEW library based on system architecture
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(GLEW_LIB_DIR "${GLEW_DIR}/lib/Release/x64")
-else()
-    set(GLEW_LIB_DIR "${GLEW_DIR}/lib/Release/Win32")
+# Windows-specific configuration
+if(WIN32)
+    set(WINDOWS_LIBS opengl32 gdi32 user32 kernel32)
 endif()
 
-# Define GLEW_STATIC for static linking
-add_compile_definitions(GLEW_STATIC)
+# ========================
+# Dependencies: vcpkg integration
+# ========================
 
 # Add header file includes for all targets
 include_directories(
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "${GLEW_DIR}/include"
-    "${GLFW_INCLUDE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 # ========================
@@ -52,17 +41,19 @@ set(CORE_SOURCES
         src/core/movement.c
         src/core/time_flow.c
         src/core/collider.c
+        src/core/entity_manager.cpp
         src/graphics/OpenGL/gl_sphere.cpp
         src/graphics/OpenGL/gl_cube.c
         src/graphics/OpenGL/gl_texture.c
         src/graphics/OpenGL/gl_skybox.c
         src/graphics/OpenGL/gl_camera.c
+        src/graphics/OpenGL/gl_model.cpp
+        include/graphics/stb_image.h
 )
 
 set(MATHLIB_SOURCES
         src/mathlib/Vector.c
         src/mathlib/Quaternion.c
-        include/mathlib/Quaternion.h
 )
 
 set(OTHER_SOURCES
@@ -75,14 +66,14 @@ set(CORE_HEADERS
         include/core/movement.h
         include/core/time_flow.h
         include/core/collider.h
+        include/core/entity_manager.h
         include/graphics/OpenGL/gl_sphere.hpp
         include/graphics/OpenGL/gl_cube.h
         include/graphics/OpenGL/gl_texture.h
         include/graphics/OpenGL/gl_skybox.h
         include/graphics/OpenGL/gl_camera.h
-        src/core/entity_manager.cpp
-        include/core/entity_manager.h
-        src/core/entity_manager.cpp
+        include/graphics/OpenGL/gl_model.h
+        include/graphics/stb_image.h
 )
 
 set(OTHER_HEADERS
@@ -91,6 +82,7 @@ set(OTHER_HEADERS
         include/plog.h
         include/error_codes.h
         include/mathlib/Vector.h
+        include/mathlib/Quaternion.h
 )
 
 # ========================
@@ -115,22 +107,25 @@ endfunction()
 # Libraries
 # ========================
 
-add_library(core SHARED ${CORE_SOURCES} ${CORE_HEADERS})
+# Find packages using vcpkg
+# Use CONFIG mode for vcpkg packages
+find_package(glfw3 CONFIG REQUIRED)
+find_package(GLEW CONFIG REQUIRED)
+
+add_library(core SHARED ${CORE_SOURCES} ${CORE_HEADERS}
+        include/graphics/stb_image.h)
 setup_shared_lib(core core)
-set_target_properties(core PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(core
         mathlib
-        "${GLFW_LIB_DIR}/libglfw3.a"
+        glfw
+        GLEW::glew
         opengl32
-        "${GLEW_LIB_DIR}/glew32.lib"
 )
 
 add_library(cphysics_shared SHARED ${OTHER_SOURCES} ${OTHER_HEADERS})
 setup_shared_lib(cphysics_shared cphysics)
 
-add_library(mathlib STATIC ${MATHLIB_SOURCES} include/mathlib/Vector.h
-        src/mathlib/Quaternion.c
-        include/mathlib/Quaternion.h)
+add_library(mathlib STATIC ${MATHLIB_SOURCES} include/mathlib/Vector.h include/mathlib/Quaternion.h)
 target_include_directories(mathlib PUBLIC include)
 
 # ========================
@@ -166,24 +161,24 @@ target_link_libraries(CPhysics
 )
 
 # ========================
-# Copy DLLs to output directory
+# Copy resources to output directory
 # ========================
 
 if(WIN32)
     add_custom_command(TARGET CPhysics POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${GLEW_DIR}/bin/Release/x64/glew32.dll"
-            "${CMAKE_BINARY_DIR}/bin/glew32.dll"
-    )
-    add_custom_command(TARGET CPhysics POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${GLFW_LIB_DIR}/glfw3.dll"
-            "${CMAKE_BINARY_DIR}/bin/glfw3.dll"
-    )
-    add_custom_command(TARGET CPhysics POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/resources"
             "${CMAKE_BINARY_DIR}/bin/resources"
+    )
+    add_custom_command(TARGET CPhysics POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/bin/glfw3.dll"
+            "${CMAKE_BINARY_DIR}/bin/glfw3.dll"
+    )
+    add_custom_command(TARGET CPhysics POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/bin/glew32d.dll"
+            "${CMAKE_BINARY_DIR}/bin/glew32d.dll"
     )
 endif()
 
